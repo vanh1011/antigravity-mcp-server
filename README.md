@@ -138,14 +138,27 @@ Every parameter is listed in the [API reference](docs/api-reference.md).
 | `accept-edits` | also edit files in the workspace (default)                     |
 | `auto`         | also run commands without asking, where your account offers it |
 
-**Its permissions.** In print mode `agy` cannot stop and ask you, so anything that needs a permission prompt is refused. Out of the box that includes running shell commands (`command`) and fetching web pages (`read_url`). When that happens the tool returns a `permission-denied` error naming the permission, for example:
+**Its permissions.** In print mode `agy` cannot stop and ask you, so anything that needs a permission prompt is refused. Out of the box that includes running shell commands (`command`) and fetching web pages (`read_url`). Allow what your tasks need in `agy`'s settings (usually `~/.gemini/antigravity-cli/settings.json`), one command or domain per rule:
 
-```
-Hint: agy needs the "read_url" permission. To allow it, add a rule such as
-`read_url(<target>)` to `permissions.allow` in agy's settings.json ...
+```json
+{
+  "permissions": {
+    "allow": [
+      "command(git status)",
+      "command(git diff)",
+      "command(npx tsc)",
+      "command(npx eslint)",
+      "read_url(nodejs.org)"
+    ]
+  }
+}
 ```
 
-Add only the rules you are comfortable with to `agy`'s settings (usually `~/.gemini/antigravity-cli/settings.json`). This server never turns permissions off for you: it does not pass `--dangerously-skip-permissions`.
+A `command` rule names the binary and subcommand, and covers any arguments after it: `command(npx tsc)` allows `npx tsc -p tsconfig.app.json --noEmit`. Avoid `command(*)` and `read_url(*)`.
+
+`agy` stops the whole turn at the first action it is denied, with no partial answer. So when you hand over a task that runs commands, list the allowed commands in the prompt. When a call is denied, the tool returns a `permission-denied` error with the permission it needed, an example rule, and the rules you already allow.
+
+This server never turns permissions off for you: it does not pass `--dangerously-skip-permissions`.
 
 ## Things to try
 
@@ -167,14 +180,15 @@ Use antigravity_web_search to find what changed in the latest Spring Boot releas
 
 All settings are optional environment variables. A value passed in the tool call wins over these.
 
-| Variable             | Default        | Purpose                                                                           |
-| -------------------- | -------------- | --------------------------------------------------------------------------------- |
-| `AGY_BIN`            | `agy`          | Path to the Antigravity CLI                                                       |
-| `AGY_DEFAULT_MODEL`  | —              | Model for calls that don't name one (else `agy`'s own default)                    |
-| `AGY_DEFAULT_EFFORT` | —              | `low`, `medium`, `high`, `xhigh` or `max`                                         |
-| `AGY_DEFAULT_MODE`   | `accept-edits` | Mode for `antigravity` calls that don't set one: `plan`, `accept-edits` or `auto` |
-| `AGY_TIMEOUT_SEC`    | `600`          | Seconds before `agy` stops and returns what it has (max 3600)                     |
-| `AGY_MCP_DEBUG`      | —              | Set to `1` to log each `agy` command to stderr                                    |
+| Variable             | Default                                   | Purpose                                                                           |
+| -------------------- | ----------------------------------------- | --------------------------------------------------------------------------------- |
+| `AGY_BIN`            | `agy`                                     | Path to the Antigravity CLI                                                       |
+| `AGY_DEFAULT_MODEL`  | —                                         | Model for calls that don't name one (else `agy`'s own default)                    |
+| `AGY_DEFAULT_EFFORT` | —                                         | `low`, `medium`, `high`, `xhigh` or `max`                                         |
+| `AGY_DEFAULT_MODE`   | `accept-edits`                            | Mode for `antigravity` calls that don't set one: `plan`, `accept-edits` or `auto` |
+| `AGY_TIMEOUT_SEC`    | `600`                                     | Seconds before `agy` stops and returns what it has (max 3600)                     |
+| `AGY_MCP_DEBUG`      | —                                         | Set to `1` to log each `agy` command to stderr                                    |
+| `AGY_SETTINGS_PATH`  | `~/.gemini/antigravity-cli/settings.json` | Where to read allowed rules from, to list them in permission errors               |
 
 For example, with Claude Code:
 

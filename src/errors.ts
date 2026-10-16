@@ -43,19 +43,36 @@ const HINTS: Record<AgyErrorKind, string> = {
   'invalid-input': 'Fix the arguments and call the tool again.',
 };
 
+/** Rule shapes agy documents for each permission. */
+const RULE_EXAMPLES: Record<string, string> = {
+  command: '`command(git diff)` (binary and subcommand; avoid `command(*)`)',
+  read_url: '`read_url(nodejs.org)` (one domain; avoid `read_url(*)`)',
+  execute_url: '`execute_url(example.com)` (one domain)',
+};
+
 /**
  * Build the hint for a denied permission from agy's own message, which looks like:
  * `a tool required the "read_url" permission ... (e.g. read_url(<target>))`.
+ * `allowed` is the current `permissions.allow` list, when it could be read.
  */
-export function permissionHint(stderr: string): string {
+export function permissionHint(stderr: string, allowed: string[] = []): string {
   const permission = /required the "([^"]+)" permission/.exec(stderr)?.[1];
   if (!permission) return HINTS['permission-denied'];
-  return (
-    `agy needs the "${permission}" permission. To allow it, add a rule such as ` +
-    `\`${permission}(<target>)\` to \`permissions.allow\` in agy's settings.json ` +
-    '(usually ~/.gemini/antigravity-cli/settings.json), then call the tool again. ' +
-    'Keep the rule as narrow as you can.'
+  const example = RULE_EXAMPLES[permission] ?? `\`${permission}(<target>)\``;
+  const lines = [
+    `agy needs a "${permission}" permission that is not allowed yet. Add a rule such as ` +
+      `${example} to \`permissions.allow\` in agy's settings.json ` +
+      '(usually ~/.gemini/antigravity-cli/settings.json), then call the tool again.',
+    'agy stops at the first denied action, so a task should only use actions that are allowed. ' +
+      'Name the allowed commands in the prompt.',
+  ];
+  const sameKind = allowed.filter((rule) => rule.startsWith(`${permission}(`));
+  lines.push(
+    sameKind.length > 0
+      ? `Currently allowed ${permission} rules: ${sameKind.join(', ')}`
+      : `No ${permission} rules are allowed yet.`,
   );
+  return lines.join('\n');
 }
 
 /** Turn any thrown value into a readable message for the MCP client. */

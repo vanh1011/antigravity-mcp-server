@@ -1,0 +1,6 @@
+{
+  "model": "Fake Flash (Medium)",
+  "permissions": {
+    "allow": ["read_url(nodejs.org)", "command(git status)"]
+  }
+}

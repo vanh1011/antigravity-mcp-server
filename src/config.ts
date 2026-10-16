@@ -1,6 +1,7 @@
 import { DEFAULTS, EFFORTS, ENV, MODES } from './constants.js';
 import { ConfigError } from './errors.js';
 import type { Effort, Mode, ServerConfig } from './types.js';
+import { settingsPath } from './utils/agySettings.js';
 
 function pick<T extends string>(
   name: string,
@@ -31,5 +32,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     defaultEffort: pick<Effort>(ENV.EFFORT, env[ENV.EFFORT], EFFORTS),
     defaultMode: pick<Mode>(ENV.MODE, env[ENV.MODE], MODES) ?? DEFAULTS.MODE,
     timeoutSec,
+    settingsPath: settingsPath(env),
   };
 }

@@ -13,7 +13,14 @@ import type { ServerConfig } from '../types.js';
 const FAKE_AGY = fileURLToPath(new URL('./fixtures/fake-agy.mjs', import.meta.url));
 
 // Real defaults, pointed at the fake agy.
-const baseConfig: ServerConfig = { ...loadConfig({}), bin: FAKE_AGY, timeoutSec: 30 };
+const FAKE_SETTINGS = fileURLToPath(new URL('./fixtures/agy-settings.json', import.meta.url));
+
+const baseConfig: ServerConfig = {
+  ...loadConfig({}),
+  bin: FAKE_AGY,
+  timeoutSec: 30,
+  settingsPath: FAKE_SETTINGS,
+};
 
 let client: Client | undefined;
 
@@ -121,8 +128,16 @@ describe('MCP server', () => {
     const r = await call(c, 'antigravity', { prompt: 'DENIED' });
     expect(r.isError).toBe(true);
     expect(r.text).toContain('permission-denied');
-    expect(r.text).toContain('`read_url(<target>)`');
+    expect(r.text).toContain('`read_url(nodejs.org)`');
     expect(r.text).toContain('permissions.allow');
+    expect(r.text).toContain('Currently allowed read_url rules: read_url(nodejs.org)');
+  });
+
+  it('still explains a denied permission when agy settings cannot be read', async () => {
+    const c = await connect({ settingsPath: '/definitely/not/settings.json' });
+    const r = await call(c, 'antigravity', { prompt: 'DENIED' });
+    expect(r.isError).toBe(true);
+    expect(r.text).toContain('No read_url rules are allowed yet.');
   });
 
   it('does not report an empty answer as success', async () => {

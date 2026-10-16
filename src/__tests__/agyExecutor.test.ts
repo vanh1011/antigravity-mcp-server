@@ -87,7 +87,7 @@ describe('parseAskOutput', () => {
     expect(() => parseAskOutput({ code: 0, stdout: empty, stderr }, 60)).toThrowError(
       expect.objectContaining({
         kind: 'permission-denied',
-        hint: expect.stringContaining('`command(<target>)`'),
+        hint: expect.stringContaining('`command(git diff)`'),
       }),
     );
   });

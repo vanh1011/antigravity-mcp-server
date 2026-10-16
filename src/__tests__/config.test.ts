@@ -10,6 +10,7 @@ describe('loadConfig', () => {
       defaultEffort: undefined,
       defaultMode: 'accept-edits',
       timeoutSec: 600,
+      settingsPath: expect.stringMatching(/\.gemini\/antigravity-cli\/settings\.json$/),
     });
   });
 
@@ -21,6 +22,7 @@ describe('loadConfig', () => {
         AGY_DEFAULT_EFFORT: 'high',
         AGY_DEFAULT_MODE: 'accept-edits',
         AGY_TIMEOUT_SEC: '120',
+        AGY_SETTINGS_PATH: '/tmp/agy-settings.json',
       }),
     ).toEqual({
       bin: '/opt/agy',
@@ -28,6 +30,7 @@ describe('loadConfig', () => {
       defaultEffort: 'high',
       defaultMode: 'accept-edits',
       timeoutSec: 120,
+      settingsPath: '/tmp/agy-settings.json',
     });
   });
 
@@ -50,9 +53,15 @@ describe('formatError', () => {
   });
 
   it('names the permission rule when agy says which one it needed', () => {
-    expect(permissionHint('a tool required the "read_url" permission that headless')).toContain(
-      '`read_url(<target>)`',
-    );
+    const stderr = 'a tool required the "command" permission that headless';
+    const none = permissionHint(stderr);
+    expect(none).toContain('`command(git diff)`');
+    expect(none).toContain('No command rules are allowed yet.');
+    expect(none).toContain('stops at the first denied action');
+
+    const some = permissionHint(stderr, ['command(git status)', 'read_url(github.com)']);
+    expect(some).toContain('Currently allowed command rules: command(git status)');
+    expect(some).not.toContain('github.com');
     expect(permissionHint('something else')).toContain('permissions.allow');
   });
 

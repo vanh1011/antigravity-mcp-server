@@ -46,7 +46,7 @@ prints `<id>\t<display name>` per line. Pass the id as `model`. To change what `
 
 **The call takes a long time and the client gives up.** Some clients stop waiting before `agy` is done. Lower `timeoutSec` so `agy` returns a partial answer in time, or raise the client's own tool timeout (in Claude Code: the `MCP_TOOL_TIMEOUT` environment variable, in milliseconds).
 
-**`permission-denied` error.** In print mode `agy` cannot ask you before running a command (`command`) or fetching a page (`read_url`), so it refuses. The error names the permission. Add a rule for it under `permissions.allow` in `agy`'s settings.json (usually `~/.gemini/antigravity-cli/settings.json`), as narrow as you can make it, then call the tool again. Check the Antigravity docs for the target patterns a rule accepts.
+**`permission-denied` error.** In print mode `agy` cannot ask you before running a command (`command`) or fetching a page (`read_url`), so it refuses, and it ends the whole turn at that point. The error names the permission, gives an example rule, and lists the rules you already allow. Add the rule under `permissions.allow` in `agy`'s settings.json (usually `~/.gemini/antigravity-cli/settings.json`), one binary and subcommand or one domain per rule, e.g. `command(npx tsc)` or `read_url(nodejs.org)`, then call the tool again. In the task prompt, tell `agy` which commands it may run, so it does not reach for one that is not allowed.
 
 **`warning: --mode auto is not available for this account`.** Your plan does not offer `auto`, so `agy` falls back to its default mode. The warning shows up in the tool's footer. Use `accept-edits` instead, plus allow rules for the commands you want it to run.
 

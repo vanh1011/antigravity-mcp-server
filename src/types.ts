@@ -9,6 +9,8 @@ export interface ServerConfig {
   defaultEffort?: Effort;
   defaultMode: Mode;
   timeoutSec: number;
+  /** agy's settings.json, read to list allowed rules in permission errors. */
+  settingsPath: string;
 }
 
 export interface AskOptions {

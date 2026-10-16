@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 — 2026-10-16
+
+- `permission-denied` errors now give a concrete example rule, list the rules already allowed in `agy`'s settings.json, and explain that `agy` stops at the first denied action.
+- New `AGY_SETTINGS_PATH` to point at a non-default `agy` settings file.
+- README: how to write `permissions.allow` rules.
+
 ## 0.1.0 — 2026-10-16
 
 First public release.

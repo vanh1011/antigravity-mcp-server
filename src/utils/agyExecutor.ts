@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 import { DEFAULTS } from '../constants.js';
 import { AgyError, permissionHint } from '../errors.js';
 import type { AgyJsonOutput, AskOptions, AskResult, ModelInfo, ServerConfig } from '../types.js';
+import { readAllowRules } from './agySettings.js';
 import { logger } from './logger.js';
 
 export interface ProcessResult {
@@ -168,7 +169,21 @@ export async function ask(
     hardTimeoutMs: o.timeoutSec * 1000 + DEFAULTS.KILL_GRACE_MS,
     signal,
   });
-  return parseAskOutput(r, o.timeoutSec);
+  try {
+    return parseAskOutput(r, o.timeoutSec);
+  } catch (error) {
+    // Show which rules are already allowed, so the user sees what is missing.
+    if (error instanceof AgyError && error.kind === 'permission-denied') {
+      const allowed = await readAllowRules(config.settingsPath);
+      throw new AgyError(
+        error.kind,
+        error.message,
+        error.details,
+        permissionHint(r.stderr, allowed),
+      );
+    }
+    throw error;
+  }
 }
 
 /** Parse `agy models`, which prints one "<id>\t<display name>" per line. */

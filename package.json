@@ -1,6 +1,6 @@
 {
   "name": "@vanh1011/antigravity-mcp-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server that lets Claude Code, Cursor, Codex and other MCP clients call the Antigravity CLI (agy)",
   "type": "module",
   "main": "dist/index.js",
