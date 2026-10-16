@@ -1,0 +1,68 @@
+{
+  "name": "@vanh1011/antigravity-mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server that lets Claude Code, Cursor, Codex and other MCP clients call the Antigravity CLI (agy)",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "antigravity-mcp-server": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "!dist/__tests__"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "clean": "rm -rf dist",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "antigravity",
+    "agy",
+    "gemini",
+    "claude",
+    "cli",
+    "ai"
+  ],
+  "author": "vanh1011",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vanh1011/antigravity-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vanh1011/antigravity-mcp-server/issues"
+  },
+  "homepage": "https://github.com/vanh1011/antigravity-mcp-server#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.5",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^5.0.5"
+  }
+}
